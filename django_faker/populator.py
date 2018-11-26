@@ -90,6 +90,14 @@ class Populator(object):
         self.quantities = {}
         self.orders = []
 
+    def reset(self):
+        """
+        :param generator: Generator
+        """
+        self.entities = {}
+        self.quantities = {}
+        self.orders = []
+
     def add_entity(self, model, number, custom_field_formatters=None):
         """
         Add an order for the generation of $number records for $entity.
