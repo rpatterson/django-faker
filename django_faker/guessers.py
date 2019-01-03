@@ -177,7 +177,9 @@ class FieldTypeGuesser(FieldGuesser):
         if isinstance(field, UUIDField):
             return lambda x: generator.uuid4()
         if isinstance(field, CharField):
-            return lambda x: generator.text(field.max_length) if field.max_length >= 5 else generator.word()
+            return lambda x: (
+                generator.text(field.max_length) if field.max_length >= 5 else
+                generator.word()[:field.max_length])
 
         if isinstance(field, BinaryField):
             return lambda x: generator.binary(length=1048576)  # limit for performance
