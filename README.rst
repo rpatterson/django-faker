@@ -182,6 +182,8 @@ Changelog
 `0.3dev <http://github.com/joke2k/django-faker/compare/v0.2...master>`__
 ------------------------------------------------------------------------
 
+- Add arbitrary content in FileFields/ImageFields
+  [@rpatterson]
 - Fix DateFields being populated with strings
   [@rpatterson]
 - Fix CharFields being populated with too many characters

@@ -1,5 +1,8 @@
+import os
 import random
 import re
+import tempfile
+
 import pytz
 from django.core import validators
 from django.db.models import ForeignKey, ManyToManyField, OneToOneField, ImageField, FileField, \
@@ -197,10 +200,22 @@ class FieldTypeGuesser(FieldGuesser):
         if isinstance(field, TimeField):
             return lambda x: generator.time()
 
-        if isinstance(field, ImageField):
-            return lambda x: None
         if isinstance(field, FileField):
-            return lambda x: None
+            def populateFileField(inserted_entities):
+                """
+                Generate a temporary file with content.
+                """
+                if isinstance(field, ImageField):
+                    file_name = generator.file_name(category='image')
+                else:
+                    file_name = generator.file_name()
+                prefix, suffix = os.path.splitext(file_name)
+                temp_file = tempfile.NamedTemporaryFile(
+                    prefix=prefix, suffix=suffix)
+                temp_file.write(generator.binary())
+                temp_file.seek(0)
+                return temp_file
+            return populateFileField
         if isinstance(field, FilePathField):
             return lambda x: "/"
 
