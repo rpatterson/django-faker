@@ -189,7 +189,7 @@ class FieldTypeGuesser(FieldGuesser):
             return lambda x: generator.null_boolean()
 
         if isinstance(field, DateField):
-            return lambda x: generator.date()
+            return lambda x: generator.date_object()
         if isinstance(field, DateTimeField):
             return lambda x: generator.date_time(tzinfo=pytz.UTC)
         if isinstance(field, DurationField):
