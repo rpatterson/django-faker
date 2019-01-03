@@ -162,6 +162,11 @@ http://127.0.0.1:8000/preview/ shows a faked browser windows, useful for screens
 Running the Tests
 -----------------
 
+Run the full test matrix locally with tox:
+
+    $ pip install tox
+    $ tox
+
 Run django tests in a django environment:
 
     $ python runtests.py
