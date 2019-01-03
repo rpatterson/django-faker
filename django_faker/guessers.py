@@ -1,6 +1,7 @@
 import random
 import re
 import pytz
+from django.core import validators
 from django.db.models import ForeignKey, ManyToManyField, OneToOneField, ImageField, FileField, \
     PositiveSmallIntegerField, BigIntegerField, SmallIntegerField, PositiveIntegerField, IntegerField, DecimalField, \
     FloatField, SlugField, URLField, EmailField, TextField, UUIDField, CharField, BinaryField, BooleanField, \
@@ -122,6 +123,22 @@ def relation_wrapper(local_field):
 
 
 class FieldTypeGuesser(FieldGuesser):
+    """
+    Guess field values based on Django model field types.
+    """
+
+    def has_positive_limit(self, field):
+        """
+        Determine whether a float or decimal field requires a positive value.
+        """
+        for validator in field.validators:
+            if (
+                    isinstance(
+                        validator, validators.MinValueValidator) and
+                    validator.limit_value >= 0):
+                return True
+        return False
+
     def guess_format(self, field):  # pylint: disable=too-many-return-statements,too-many-branches
         generator = self.generator
         if field.choices:
@@ -139,11 +156,15 @@ class FieldTypeGuesser(FieldGuesser):
             return lambda x: generator.random_int(-2147483648, 2147483647)
 
         if isinstance(field, DecimalField):
-            return lambda x: generator.pydecimal(left_digits=field.max_digits - field.decimal_places,
-                                                 right_digits=field.decimal_places)
+            return lambda x: generator.pydecimal(
+                left_digits=field.max_digits - field.decimal_places,
+                right_digits=field.decimal_places,
+                positive=self.has_positive_limit(field))
         if isinstance(field, FloatField):
-            return lambda x: generator.pyfloat(left_digits=field.max_digits - field.decimal_places,
-                                               right_digits=field.decimal_places)
+            return lambda x: generator.pyfloat(
+                left_digits=field.max_digits - field.decimal_places,
+                right_digits=field.decimal_places,
+                positive=self.has_positive_limit(field))
 
         if isinstance(field, SlugField):
             return lambda x: generator.slug()
